@@ -12,7 +12,7 @@ from typing import \
 E = TypeVar('E')
 V = TypeVar('V')
 
-class Trie(Generic[E,V], Dict[Iterable[E], V]):
+class Trie(Generic[E,V], MutableMapping[Iterable[E], V]):
     def __init__(self: 'Trie[E,V]', val: Optional[V] = None) -> None:
         self.val: Optional[V] = val
         self.elems: MutableMapping[E,Trie[E,V]] = dict()
