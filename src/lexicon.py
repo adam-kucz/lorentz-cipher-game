@@ -15,6 +15,7 @@ class Lexicon(Trie[Char,str]):
 
 class BasicLexicon(Lexicon):    
     def __init__(self: 'Lexicon', filename: str) -> None:
+        super().__init__()
         with open(filename, 'r') as f:
             for line in f:
                 word: str = line[:-1].lower()

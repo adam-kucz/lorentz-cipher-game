@@ -1,6 +1,6 @@
 from typing import Sequence
 
-from decrypt import xor
+import decrypt
 from extensions import mean
 from lexicon import Lexicon
 
@@ -21,7 +21,9 @@ class PartiallyDecrypted:
         if i == -1:
             i = 0
         encrypted_by_seq: str = self.encrypted[self.pos : self.pos+len(seq)]
-        newly_decrypted: str = self.decrypted[i:] + xor(encrypted_by_seq, seq)
+        newly_decrypted: str = \
+            self.decrypted[i:] \
+            + decrypt.xor(encrypted_by_seq, seq)
         decrypted_words: Sequence[str] = newly_decrypted.split(WORD_SEPARATOR)
         scores: Sequence[float] = \
             [self.lexicon.score_word(w) for w in decrypted_words[:-1]] \
