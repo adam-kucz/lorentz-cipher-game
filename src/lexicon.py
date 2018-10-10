@@ -1,3 +1,5 @@
+from typing import TextIO
+
 from extensions import empty
 from trie import Trie
 
@@ -16,7 +18,7 @@ class Lexicon(Trie[Char,str]):
 class BasicLexicon(Lexicon):    
     def __init__(self: 'Lexicon', filename: str) -> None:
         super().__init__()
-        with open(filename, 'r') as f:
-            for line in f:
+        with open(filename, 'r') as f: # type: TextIO
+            for line in f: # type: str
                 word: str = line[:-1].lower()
                 self[(c for c in word)] = word        

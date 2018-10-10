@@ -8,7 +8,7 @@ from lexicon import BasicLexicon, Lexicon
 from trie import Trie
 
 def score_next_seq(
-        seq: str,
+        seq: Cipher,
         partial_encryptions: Sequence[PartiallyDecrypted])-> float:
     return mean([enc.score_next_seq(seq) for enc in partial_encryptions])
 

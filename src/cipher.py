@@ -71,9 +71,11 @@ class Cipher(Sequence[Bits]):
 
 def xor_pairwise(encrypted: Sequence[Cipher]) -> Dict[int, Dict[int, Cipher]]:
     result: Dict[int, Dict[int, Cipher]] = dict()
-    for i1, msg1 in enumerate(encrypted):
+    for i1, msg1 in enumerate(encrypted): # type: int, Cipher
         d: Dict[int,Cipher] = dict()
-        for i2, msg2 in filter(lambda t: t[0] != i1, enumerate(encrypted)):
+        other_msgs: Iterable[Tuple[int, Cipher]] = \
+            filter(lambda t: t[0] != i1, enumerate(encrypted))
+        for i2, msg2 in other_msgs: # type: int, Cipher
             d[i2] = msg1.xor(msg2)
         result[i1] = d
     return result
