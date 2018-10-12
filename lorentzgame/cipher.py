@@ -44,7 +44,7 @@ BITS_TO_CHAR: Dict[Bits, Char] = dict((i, c) for (c, i) in CODES)
 
 class Cipher(Sequence[Bits]):
     def __init__(self: 'Cipher',
-                 src: Union[str, Iterable[Bits], None]) -> None:
+                 src: Union[str, Iterable[Bits], None] = None) -> None:
         if src is None:
             self.seq: List[Bits] = []
         elif isinstance(src, str):
@@ -79,6 +79,9 @@ class Cipher(Sequence[Bits]):
     def __iter__(self: 'Cipher') -> Iterator[Bits]:
         return iter(self.seq)
 
+    def __add__(self: 'Cipher', other: 'Cipher') -> 'Cipher':
+        return Cipher(self.seq + other.seq)
+
     def __str__(self: 'Cipher') -> str:
         return '0x' + ''.join(repr(bits) for bits in self.seq)
 
@@ -86,7 +89,7 @@ class Cipher(Sequence[Bits]):
         return str(self)
 
 
-def xor_pairwise(encrypted: Sequence[Cipher]) -> Dict[int, Dict[int, Cipher]]:
+def xor_pairwise(encrypted: Iterable[Cipher]) -> Dict[int, Dict[int, Cipher]]:
     result: Dict[int, Dict[int, Cipher]] = dict()
     for i1, msg1 in enumerate(encrypted):  # type: int, Cipher
         d: Dict[int, Cipher] = dict()

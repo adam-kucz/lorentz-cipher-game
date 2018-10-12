@@ -26,10 +26,10 @@ class Trie(Generic[E, V], MutableMapping[Iterable[E], V]):
 
     def __iter__(self: 'Trie[E,V]') -> Iterator[Iterable[E]]:
         if self.val is not None:
-            yield iter([])
+            yield ()
         for e, subtrie in self.elems.items(): # type: E, Trie[E,V]
             for elem in subtrie: # type: Iterable[E]
-                yield chain([e], elem)
+                yield tuple(chain([e], elem))
 
     def __getitem__(self: 'Trie[E,V]', n: Iterable[E]) -> V:
         try:
@@ -47,7 +47,7 @@ class Trie(Generic[E, V], MutableMapping[Iterable[E], V]):
             e: E = next(iterator)
             if e not in self.elems:
                 self.elems[e] = Trie[E, V]()
-            self.elems[e][n] = v
+            self.elems[e][iterator] = v
         except StopIteration:
             self.val = v
 
