@@ -8,10 +8,12 @@ from typing import \
     Optional, \
     TypeVar
 
-E = TypeVar('E')
-V = TypeVar('V')
+E = TypeVar('E')  # pylint: disable=invalid-name
+V = TypeVar('V')  # pylint: disable=invalid-name
+
 
 class Trie(Generic[E, V], MutableMapping[Iterable[E], V]):
+    """ """
     def __init__(self: 'Trie[E,V]', val: Optional[V] = None) -> None:
         self.val: Optional[V] = val
         self.elems: MutableMapping[E, Trie[E, V]] = dict()

@@ -10,58 +10,64 @@ from typing import \
     Tuple, \
     Union
 
-from .lexicon import Char
+from .lexicon import Char, unpack, CHARSET
 
-## TODO: place it somewhere else where it fits better
-WORD_SEPARATOR = ' '
 
-class Bits:
-    def __init__(self: 'Bits', n: int = 0) -> None:
+class HexInt:
+    """Code symbol in binary format"""
+    def __init__(self: 'HexInt', n: int = 0) -> None:
         self.__n = n
 
-    def __repr__(self: 'Bits') -> str:
+    def __repr__(self: 'HexInt') -> str:
         return '{:02x}'.format(self.__n)
 
-    def __str__(self: 'Bits') -> str:
+    def __str__(self: 'HexInt') -> str:
         return '0x' + str(self)
 
-    def __xor__(self: 'Bits', other: 'Bits') -> 'Bits':
-        return Bits(int(self) ^ int(other))
+    def __xor__(self: 'HexInt', other: 'HexInt') -> 'HexInt':
+        return HexInt(int(self) ^ int(other))
 
-    def __int__(self: 'Bits') -> int:
+    def __int__(self: 'HexInt') -> int:
         return self.__n
 
-## TODO: replace hardcoded functions
-## probably with higher level
-CHARSET: str = WORD_SEPARATOR + '&l1530b9xy2cn,ho-/7r8wgza.s6\'jkf4ume!qvpitd'
+
+Bits = HexInt
+
+# TODO: replace hardcoded functions
+# probably with higher level
 CODES: Iterable[Tuple[Char, Bits]] = \
-    [(CHARSET[i], Bits(i)) for i in range(len(CHARSET))]
-#     [(' ' if i == 0 else chr(ord('a') - 1 + i), i) \
-#      for i in range(1 + ord('z') - ord('a') + 1)]
+    [(c, Bits(i)) for i, c in enumerate(CHARSET)]
 CHAR_TO_BITS: Dict[Char, Bits] = dict(CODES)
 BITS_TO_CHAR: Dict[Bits, Char] = dict((i, c) for (c, i) in CODES)
 
 
 class Cipher(Sequence[Bits]):
+    """ a cipher """
     def __init__(self: 'Cipher',
                  src: Union[str, Iterable[Bits], None] = None) -> None:
         if src is None:
             self.seq: List[Bits] = []
         elif isinstance(src, str):
-            self.seq: List[Bits] = [self.__char_to_bits(c) for c in src]
+            self.seq: List[Bits] = list(map(self.__char_to_bits, unpack(src)))
         else:
             self.seq: List[Bits] = list(cast(Iterable[Bits], src))
 
     @staticmethod
-    def __char_to_bits(c: Char) -> Bits:
-        return CHAR_TO_BITS[c]
+    def __char_to_bits(char: Char) -> Bits:
+        return CHAR_TO_BITS[char]
 
     @staticmethod
-    def __bits_to_char(b: Bits) -> Char:
-        return BITS_TO_CHAR[b]
+    def __bits_to_char(bits: Bits) -> Char:
+        return BITS_TO_CHAR[bits]
 
     @property
-    def word(self: 'Cipher') -> Optional[str]:
+    def string(self: 'Cipher') -> Optional[str]:
+        """
+        Interpret the cipher as a string
+
+        :returns: Optional[str]: string of this cipher if possible,
+        None otherwise
+        """
         try:
             return ''.join(self.__bits_to_char(b) for b in self.seq)
         except KeyError:
@@ -87,16 +93,3 @@ class Cipher(Sequence[Bits]):
 
     def __repr__(self: 'Cipher') -> str:
         return str(self)
-
-
-def xor_pairwise(encrypted: Iterable[Cipher]) -> Dict[int, Dict[int, Cipher]]:
-    result: Dict[int, Dict[int, Cipher]] = dict()
-    for i1, msg1 in enumerate(encrypted):  # type: int, Cipher
-        d: Dict[int, Cipher] = dict()
-        other_msgs: Iterable[Tuple[int, Cipher]] = \
-            filter(lambda t: t[0] != i1, # pylint: disable=cell-var-from-loop
-                   enumerate(encrypted))
-        for i2, msg2 in other_msgs:  # type: int, Cipher
-            d[i2] = msg1 ^ msg2
-        result[i1] = d
-    return result

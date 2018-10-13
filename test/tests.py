@@ -13,8 +13,14 @@ MESSAGES_PATH: str = DATA_DIR + "/messages.txt"
 ENCRYPTED_PATH: str = DATA_DIR + "/encrypted.txt"
 
 class TestLorentz(TestCase):
+    """ """
 
     def test_blankkey(self: 'TestCase') -> None:
+        """
+
+        :param self: 'TestCase': 
+
+        """
         vocabulary: Lexicon = BasicLexicon(WORDS_BASIC_PATH)
         print("vocabulary size: " + str(len(vocabulary)))
         # print("vocab starting with ande*: " + str(vocabulary("ande")))

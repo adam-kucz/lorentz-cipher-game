@@ -1,5 +1,5 @@
 from itertools import chain
-from typing import Iterable, Optional, Sequence
+from typing import Iterable, Optional
 
 from .cipher import Cipher, WORD_SEPARATOR
 from .partial_decrypt import PartialDecrypt  #, MAX_SCORE
@@ -9,6 +9,7 @@ from .trie import Trie
 
 
 class Decryption:
+    """ """
     def __init__(self: 'Decryption', vocab: Lexicon,
                  encrypted: Iterable[Cipher]) -> None:
         self.vocab: Lexicon = vocab
@@ -18,7 +19,12 @@ class Decryption:
         self.key: Cipher = Cipher()
 
     @property
-    def plaintext(self: 'Decryption') -> Sequence[Optional[str]]:
+    def plaintext(self: 'Decryption') -> Iterable[Optional[str]]:
+        """
+
+        :param self: 'Decryption': 
+
+        """
         while len(self.key) < self.target:
             cipher: Cipher = self.best_next_cipher
             self.key += cipher
@@ -27,10 +33,21 @@ class Decryption:
         return map(lambda s: s.decrypted, self.decryptions)
 
     def score_next_seq(self: 'Decryption', seq: Cipher) -> float:
+        """
+
+        :param self: 'Decryption': 
+        :param seq: Cipher: 
+
+        """
         return mean([enc.score_next_seq(seq) for enc in self.decryptions])
 
     @property
     def all_candidates(self: 'Decryption') -> Iterable[Cipher]:
+        """
+
+        :param self: 'Decryption': 
+
+        """
         for candidate in self.decryptions:  # type: PartialDecrypt
             subtree: Optional[Trie[Char, str]] = self.vocab(candidate.prefix)
             if subtree is None:
@@ -41,6 +58,11 @@ class Decryption:
 
     @property
     def best_next_cipher(self: 'Decryption') -> Cipher:
+        """
+
+        :param self: 'Decryption': 
+
+        """
         best_score: float = float('-inf')
         best_cipher: Cipher = Cipher()
         for cipher in self.all_candidates:  # type: Cipher

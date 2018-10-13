@@ -1,11 +1,12 @@
-from typing import cast, Optional, Sequence
+from typing import cast, Collection, Optional, Sequence
 
 from .cipher import Cipher, WORD_SEPARATOR
 from .extensions import mean
-from .lexicon import Lexicon
+from .lexicon import Lexicon, Char, unpack
 
 
 class PartialDecrypt:
+    """ """
     def __init__(
             self: 'PartialDecrypt',
             encrypted: Cipher,
@@ -16,14 +17,27 @@ class PartialDecrypt:
 
     @property
     def pos(self: 'PartialDecrypt') -> int:
+        """
+
+        :param self: 'PartialDecrypt': 
+
+        """
         return len(self.decrypted)
-    
+
     @property
-    def prefix(self: 'PartialDecrypt') -> str:
-        return self.decrypted.rsplit(WORD_SEPARATOR, 1)[1]
+    def prefix(self: 'PartialDecrypt') -> Collection[Char]: \
+        # pylint: disable=unsubscriptable-object
+        return tuple(unpack(self.decrypted.rsplit(WORD_SEPARATOR, 1)[1]))
 
     def __get_decrypt_next_str(self: 'PartialDecrypt',
-                              seq: Cipher) -> Optional[str]:
+                               seq: Cipher) -> Optional[str]:
+        """
+
+        :param self: 'PartialDecrypt') -> Collection[Char]: \# pylint: disable:  (Default value = unsubscriptable-objectreturn tuple(unpack(self.decrypted.rsplit(WORD_SEPARATOR)
+        :param 1)[1]))__get_decrypt_next_str(self: 'PartialDecrypt': 
+        :param seq: Cipher: 
+
+        """
         i: int = self.decrypted.rfind(WORD_SEPARATOR)
         if i == -1:
             i = 0
@@ -35,6 +49,12 @@ class PartialDecrypt:
         return self.decrypted[i:] + cast(str, decryption_candidate)
 
     def decrypt_next_with(self: 'PartialDecrypt', seq: Cipher) -> None:
+        """
+
+        :param self: 'PartialDecrypt': 
+        :param seq: Cipher: 
+
+        """
         string: Optional[str] = self.__get_decrypt_next_str(seq)
         if string is not None:
             self.decrypted += string
@@ -42,9 +62,17 @@ class PartialDecrypt:
             raise ValueError("Invalid key for decryption")
 
     MAX_SCORE: float = max(Lexicon.MAX_SEQ_SCORE, Lexicon.MAX_WORD_SCORE)
-    
+
     def score_next_seq(self: 'PartialDecrypt', seq: Cipher) -> float:
-        newly_decrypted: str = self.__get_decrypt_next_str(seq)
+        """
+
+        :param self: 'PartialDecrypt': 
+        :param seq: Cipher: 
+
+        """
+        newly_decrypted: Optional[str] = self.__get_decrypt_next_str(seq)
+        if newly_decrypted is None:
+            return 0
         decrypted_words: Sequence[str] = newly_decrypted.split(WORD_SEPARATOR)
         scores: Sequence[float] = \
             [self.lexicon.score_word(w) for w in decrypted_words[:-1]] \

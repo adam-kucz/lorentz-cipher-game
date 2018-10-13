@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Main module to interactively run a lorentz game decryption"""
 
 from typing import List
 
